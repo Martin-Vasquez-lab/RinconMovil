@@ -6,14 +6,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-
+import androidx.compose.material3.ExperimentalMaterial3Api
 import com.example.rinconinalambricomovil.model.Categoria
 import com.example.rinconinalambricomovil.components.CartIconWithMenu
 import com.example.rinconinalambricomovil.ui.navigation.Routes
 import com.example.rinconinalambricomovil.ui.state.CarritoViewModel
 import androidx.compose.material3.CenterAlignedTopAppBar
 
+
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 fun HomeScreen(
     nav: NavController,
     carritoVM: CarritoViewModel
