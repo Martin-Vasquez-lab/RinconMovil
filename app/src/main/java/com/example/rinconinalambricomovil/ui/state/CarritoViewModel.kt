@@ -7,6 +7,8 @@ import com.example.rinconinalambricomovil.model.Producto
 import java.text.NumberFormat
 import java.util.Locale
 
+
+
 class CarritoViewModel : ViewModel() {
     private val _items = mutableStateListOf<CartItem>()
     val items: List<CartItem> get() = _items
@@ -16,16 +18,16 @@ class CarritoViewModel : ViewModel() {
     }
 
     fun add(p: Producto) {
-        val i = _items.indexOfFirst { it.producto.id == p.id }
-        if (i >= 0) _items[i] = _items[i].copy(cantidad = _items[i].cantidad + 1)
+        val idx = _items.indexOfFirst { it.producto.id == p.id }
+        if (idx >= 0) _items[idx] = _items[idx].copy(cantidad = _items[idx].cantidad + 1)
         else _items.add(CartItem(p, 1))
     }
     fun minusOne(p: Producto) {
-        val i = _items.indexOfFirst { it.producto.id == p.id }
-        if (i >= 0) {
-            val it = _items[i]
-            if (it.cantidad > 1) _items[i] = it.copy(cantidad = it.cantidad - 1)
-            else _items.removeAt(i)
+        val idx = _items.indexOfFirst { it.producto.id == p.id }
+        if (idx >= 0) {
+            val it = _items[idx]
+            if (it.cantidad > 1) _items[idx] = it.copy(cantidad = it.cantidad - 1)
+            else _items.removeAt(idx)
         }
     }
     fun remove(p: Producto) { _items.removeAll { it.producto.id == p.id } }
@@ -33,5 +35,6 @@ class CarritoViewModel : ViewModel() {
 
     val itemCount get() = _items.sumOf { it.cantidad }
     val total get() = _items.sumOf { it.producto.precio * it.cantidad }
-    fun formatCLP(v: Double) = clp.format(v)
+
+    fun money(v: Double) = clp.format(v)
 }
