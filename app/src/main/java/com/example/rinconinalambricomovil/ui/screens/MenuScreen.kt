@@ -3,6 +3,7 @@ package com.example.rinconinalambricomovil.ui.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -12,8 +13,6 @@ import com.example.rinconinalambricomovil.components.CartIconWithMenu
 import com.example.rinconinalambricomovil.ui.navigation.Routes
 import com.example.rinconinalambricomovil.ui.state.CarritoViewModel
 import androidx.compose.material3.CenterAlignedTopAppBar
-
-
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun HomeScreen(
@@ -45,6 +44,13 @@ fun HomeScreen(
             CategoryButton("Audífonos") { nav.navigate("categoria/${Categoria.AUDIFONOS.name}") }
             CategoryButton("Figuras") { nav.navigate("categoria/${Categoria.FIGURAS.name}") }
             CategoryButton("Consolas") { nav.navigate("categoria/${Categoria.CONSOLAS.name}") }
+
+            Button(
+                onClick = { nav.navigate(Routes.LOGIN) },
+                modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
+            ) {
+                Text("Ir a Login")
+            }
         }
     }
 }
@@ -57,5 +63,18 @@ private fun CategoryButton(text: String, onClick: () -> Unit) {
         contentPadding = PaddingValues(vertical = 14.dp)
     ) {
         Text(text)
+    }
+}
+
+@Composable
+fun MenuScreen(navController: NavController) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Button(onClick = { navController.navigate(Routes.LOGIN) }) {
+            Text("Ir a Login")
+        }
     }
 }
