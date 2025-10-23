@@ -1,4 +1,5 @@
-package com.example.elrinconinalambrico.ui.screens
+package com.example.rinconinalambricomovil.ui.screens
+
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -7,70 +8,46 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.rinconinalambricomovil.data.CarritoManager
-import com.example.rinconinalambricomovil.model.Producto
+import com.example.elrinconinalambrico.data.SampleData
+import com.example.rinconinalambricomovil.ui.state.CarritoViewModel
+import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)  // ← AGREGA ESTA LÍNEA
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MenuScreen() {
-    val productos = listOf(
-        Producto(1, "Audífonos Bluetooth", 29990.0, "Alta calidad de sonido"),
-        Producto(2, "Mouse inalámbrico", 15990.0, "Sensor óptico de precisión"),
-        Producto(3, "Teclado mecánico RGB", 49990.0, "Switches rojos silenciosos"),
-        Producto(4, "Cargador rápido", 12990.0, "Carga 3 veces más veloz")
-    )
-
-    var mensaje by remember { mutableStateOf("") }
+fun MenuScreen(carritoVM: CarritoViewModel) {
+    val productos = remember { SampleData.productos }
+    val snack = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("El Rincón Inalámbrico") }
-            )
-        },
-        content = { padding ->
-            Column(
-                modifier = Modifier
-                    .padding(padding)
-                    .padding(16.dp)
-            ) {
-                if (mensaje.isNotEmpty()) {
-                    Text(
-                        text = mensaje,
-                        color = MaterialTheme.colorScheme.primary,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
-
-                LazyColumn {
-                    items(productos) { producto ->  // ← Cambié esto por "items(productos)"
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp)
-                        ) {
-                            Column(modifier = Modifier.padding(16.dp)) {
-                                Text(producto.nombre, style = MaterialTheme.typography.titleMedium)
-                                Text("$${producto.precio}", style = MaterialTheme.typography.bodyMedium)
-                                Text(producto.descripcion, style = MaterialTheme.typography.bodySmall)
-
-                                Spacer(modifier = Modifier.height(8.dp))
-
-                                Button(
-                                    onClick = {
-                                        CarritoManager.agregarProducto(producto)
-                                        mensaje = "${producto.nombre} agregado al carrito 🛒"
-                                    },
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    Text("Agregar al carrito")
+        topBar = { TopAppBar(title = { Text("El Rincón Inalámbrico") }) },
+        snackbarHost = { SnackbarHost(hostState = snack) }
+    ) { padding ->
+        LazyColumn(
+            modifier = Modifier
+                .padding(padding)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(items = productos, key = { it.id }) { prod ->
+                Card(Modifier.fillMaxWidth()) {
+                    Column(Modifier.padding(16.dp)) {
+                        Text(prod.nombre, style = MaterialTheme.typography.titleMedium)
+                        Text(carritoVM.formatCLP(prod.precio))
+                        Text(prod.descripcion, style = MaterialTheme.typography.bodySmall)
+                        Spacer(Modifier.height(8.dp))
+                        Button(
+                            onClick = {
+                                carritoVM.add(prod)
+                                scope.launch {
+                                    snack.showSnackbar("${prod.nombre} agregado al carrito")
                                 }
-                            }
-                        }
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) { Text("Agregar al carrito") }
                     }
                 }
             }
         }
-    )
+    }
 }
