@@ -9,6 +9,8 @@ import com.example.rinconinalambricomovil.components.LoginForm
 import com.example.rinconinalambricomovil.components.LoginViewModel
 import kotlinx.coroutines.launch
 import androidx.compose.material3.SnackbarHostState
+import com.example.rinconinalambricomovil.ui.navigation.Routes
+
 
 @Composable
 fun LoginScreen(navController: NavController) {
@@ -31,7 +33,7 @@ fun LoginScreen(navController: NavController) {
     LaunchedEffect(loginState.value) {
         when (val state = loginState.value) {
             is LoginViewModel.LoginState.Success -> {
-                navController.navigate("menu") {
+                navController.navigate("home") {
                     popUpTo("login") { inclusive = true }
                 }
             }
