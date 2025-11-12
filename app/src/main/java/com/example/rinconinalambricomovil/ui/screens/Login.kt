@@ -2,60 +2,64 @@ package com.example.rinconinalambricomovil.ui.screens
 import androidx.compose.runtime.Composable
 
 
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.rinconinalambricomovil.components.LoginForm
-import com.example.rinconinalambricomovil.components.LoginViewModel
-import kotlinx.coroutines.launch
-import androidx.compose.material3.SnackbarHostState
-import com.example.rinconinalambricomovil.ui.navigation.Routes
+import kotlinx.coroutines.delay
+import com.example.rinconinalambricomovil.components.LoginViewModel  // ← ESTA LÍNEA
+import  com.example.rinconinalambricomovil.components.LoginForm
+// Si usas Compose Navigation
 
 
+
+// screens/Login.kt
 @Composable
-fun LoginScreen(navController: NavController) {
+fun LoginScreen(
+    navController: NavController
+) {
     val viewModel: LoginViewModel = viewModel()
-    val loginState = viewModel.loginState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
+    val loginState by viewModel.loginState.collectAsState()
+    val isLoading = loginState is LoginViewModel.LoginState.Loading
 
-    // Función para mostrar errores
-    fun mostrarError(mensaje: String) {
-        scope.launch {
-            snackbarHostState.showSnackbar(
-                message = "Error: $mensaje, vuelva a intentarlo",
-                actionLabel = "Reintentar"
-            )
-        }
+    Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+    ) { paddingValues ->
+        LoginForm(
+            onLoginClick = { email, password ->  // ← RECIBIR AMBOS PARÁMETROS
+                viewModel.login(email, password)  // ← PASAR AMBOS AL VIEWMODEL
+            },
+            onRegisterClick = {
+                navController.navigate("register")
+            },
+            isLoading = isLoading,
+            modifier = Modifier.padding(paddingValues)
+        )
     }
 
-    // Manejar estados del login
-    LaunchedEffect(loginState.value) {
-        when (val state = loginState.value) {
+    // Manejar estados
+    LaunchedEffect(loginState) {
+        when (loginState) {
+            is LoginViewModel.LoginState.Error -> {
+                val errorMessage = (loginState as LoginViewModel.LoginState.Error).message
+                snackbarHostState.showSnackbar(errorMessage)
+                delay(3000)
+                viewModel.resetState()
+            }
             is LoginViewModel.LoginState.Success -> {
-                navController.navigate("home") {
+                navController.navigate("menu") {
                     popUpTo("login") { inclusive = true }
                 }
-            }
-            is LoginViewModel.LoginState.Error -> {
-                mostrarError(state.message)
             }
             else -> {}
         }
     }
-
-    LoginForm(
-        onLoginClick = { email, password ->
-            // Validación simple
-            if (email.isBlank() || password.isBlank()) {
-                mostrarError("Email y contraseña son requeridos")
-                return@LoginForm
-            }
-            viewModel.login(email, password)
-        },
-        onRegisterClick = {
-            navController.navigate("register")
-        },
-        isLoading = loginState.value is LoginViewModel.LoginState.Loading
-    )
 }
+
+
