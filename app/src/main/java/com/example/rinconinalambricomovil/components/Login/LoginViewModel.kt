@@ -1,14 +1,14 @@
-package com.example.rinconinalambricomovil.components
+package com.example.rinconinalambricomovil.components.Login
 
+import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.rinconinalambricomovil.data.Usuarios
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import com.example.rinconinalambricomovil.data.Usuarios
-
 
 class LoginViewModel : ViewModel() {
 
@@ -28,7 +28,7 @@ class LoginViewModel : ViewModel() {
             _loginState.value = LoginState.Loading
 
             // Simular validación SIN API - solo validaciones básicas
-            delay(2)
+            delay(2000)
 
             // Validaciones locales sin API
             when {
@@ -46,7 +46,7 @@ class LoginViewModel : ViewModel() {
         }
     }
     private fun isValidEmail(email: String): Boolean {
-        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+        return Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
     fun resetState() {
         _loginState.value = LoginState.Idle

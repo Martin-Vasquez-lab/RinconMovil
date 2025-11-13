@@ -1,16 +1,13 @@
 package com.example.rinconinalambricomovil.data
 
 import com.example.rinconinalambricomovil.model.User
-object Usuarios {
-    val users = listOf(
-        User("loren@gmail.com","1234"),
-        User("admin@rincon.com", "admin123")
 
+object Usuarios {
+    val users = mutableListOf(
+        User("Loren","loren@gmail.com","1234", "123456789"),
+        User("Admin", "admin@rincon.com", "admin123", "987654321")
     )
 
-
-
-    //Validacion
     fun validateUser(email: String, password: String): Boolean {
         return users.any { it.email == email && it.password == password }
     }
@@ -19,4 +16,15 @@ object Usuarios {
         return users.find { it.email == email }
     }
 
+    fun existeUsuario(email: String): Boolean {
+        return users.any { it.email == email }
+    }
+
+    fun agregarUsuario(usuario: User) {
+        users.add(usuario)
+    }
+
+    fun getTotalUsuarios(): Int {
+        return users.size
+    }
 }

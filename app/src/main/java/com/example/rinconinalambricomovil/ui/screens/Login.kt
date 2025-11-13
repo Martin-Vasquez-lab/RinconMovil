@@ -3,7 +3,6 @@ import androidx.compose.runtime.Composable
 
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -12,8 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
-import com.example.rinconinalambricomovil.components.LoginViewModel  // ← ESTA LÍNEA
-import  com.example.rinconinalambricomovil.components.LoginForm
+import com.example.rinconinalambricomovil.components.Login.LoginViewModel  // ← ESTA LÍNEA
+import  com.example.rinconinalambricomovil.components.Login.LoginForm
 // Si usas Compose Navigation
 
 
@@ -36,7 +35,7 @@ fun LoginScreen(
                 viewModel.login(email, password)  // ← PASAR AMBOS AL VIEWMODEL
             },
             onRegisterClick = {
-                navController.navigate("register")
+                navController.navigate("registrar")
             },
             isLoading = isLoading,
             modifier = Modifier.padding(paddingValues)

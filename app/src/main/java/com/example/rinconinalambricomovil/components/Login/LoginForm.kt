@@ -1,4 +1,4 @@
-package com.example.rinconinalambricomovil.components
+package com.example.rinconinalambricomovil.components.Login
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
@@ -38,7 +38,6 @@ fun LoginForm(
 
     // Validaciones
     val isEmailValid = email.isNotEmpty() && email.contains("@")
-    val isPasswordValid = password.length >= 4
 
     Column(
         modifier = modifier
