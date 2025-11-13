@@ -5,4 +5,6 @@ object Routes {
     const val CATEGORIA = "categoria/{cat}" // cat: MANGA, AUDIFONOS, FIGURAS, CONSOLAS
     const val CARRITO = "carrito"
     const val LOGIN = "login"
+
+    const val REGISTER = "registrar"
 }

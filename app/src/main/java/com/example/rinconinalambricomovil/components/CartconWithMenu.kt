@@ -1,12 +1,10 @@
 package com.example.rinconinalambricomovil.components
 
-import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+
 import com.example.rinconinalambricomovil.ui.state.CarritoViewModel
 
 @Composable
@@ -40,7 +38,6 @@ fun CartIconWithMenu(
                     onClick = { /* no-op */ }
                 )
             }
-            Divider()
             DropdownMenuItem(
                 text = { Text("Total: ${carritoVM.money(carritoVM.total)}") },
                 onClick = { /* no-op */ }

@@ -1,7 +1,9 @@
-package com.example.rinconinalambricomovil.components
+package com.example.rinconinalambricomovil.components.Login
 
+import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.rinconinalambricomovil.data.Usuarios
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,17 +27,27 @@ class LoginViewModel : ViewModel() {
         viewModelScope.launch {
             _loginState.value = LoginState.Loading
 
-            // Simular validación (aquí iría tu API real)
-            delay(1000)
+            // Simular validación SIN API - solo validaciones básicas
+            delay(2000)
 
-            if (email.isNotEmpty() && password.length >= 6) {
-                _loginState.value = LoginState.Success
-            } else {
-                _loginState.value = LoginState.Error("Email o contraseña inválidos")
+            // Validaciones locales sin API
+            when {
+                Usuarios.validateUser(email,password) ->{
+                    val user = Usuarios.getUser(email)
+                    println("Usuario logeado ${user?.email}")
+
+                    _loginState.value= LoginState.Success
+                }
+                else -> {
+                    // ✅ Si pasa todas las validaciones, login exitoso
+                    _loginState.value = LoginState.Error("Gmail o contraseña no valida")
+                }
             }
         }
     }
-
+    private fun isValidEmail(email: String): Boolean {
+        return Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    }
     fun resetState() {
         _loginState.value = LoginState.Idle
     }

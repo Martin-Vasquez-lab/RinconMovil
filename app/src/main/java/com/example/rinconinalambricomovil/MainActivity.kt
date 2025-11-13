@@ -14,6 +14,7 @@ import com.example.rinconinalambricomovil.ui.screens.CarritoScreen
 import com.example.rinconinalambricomovil.ui.screens.CategoriaScreen
 import com.example.rinconinalambricomovil.ui.screens.HomeScreen
 import com.example.rinconinalambricomovil.ui.screens.LoginScreen
+import com.example.rinconinalambricomovil.ui.screens.RegistrarScreen
 import com.example.rinconinalambricomovil.ui.state.CarritoViewModel
 import com.example.rinconinalambricomovil.ui.theme.RinconInalambricoMovilTheme
 
@@ -39,6 +40,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(Routes.LOGIN) {
                             LoginScreen(navController = nav)
+                        }
+                        composable(Routes.REGISTER){
+                            RegistrarScreen(navController = nav)
                         }
                     }
                 }
