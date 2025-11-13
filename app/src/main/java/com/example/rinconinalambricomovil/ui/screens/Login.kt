@@ -5,9 +5,9 @@ import android.content.ContextWrapper
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -28,6 +28,7 @@ private fun Context.findActivity(): FragmentActivity? = when (this) {
 }
 
 // screens/Login.kt
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
     navController: NavController
@@ -57,13 +58,11 @@ fun LoginScreen(
                 object : BiometricPrompt.AuthenticationCallback() {
                     override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                         super.onAuthenticationSucceeded(result)
-                        // Si la huella es correcta, llamamos al login del ViewModel
                         viewModel.login(email, pass)
                     }
 
                     override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
                         super.onAuthenticationError(errorCode, errString)
-                        // No mostrar error si el usuario cancela
                         if (errorCode != BiometricPrompt.ERROR_NEGATIVE_BUTTON && errorCode != BiometricPrompt.ERROR_USER_CANCELED) {
                             coroutineScope.launch {
                                 snackbarHostState.showSnackbar("Error de autenticación: $errString")
@@ -80,17 +79,28 @@ fun LoginScreen(
                 .build()
             biometricPrompt.authenticate(promptInfo)
         } else {
-            // Si no hay biometría, hacer login directamente
             viewModel.login(email, pass)
         }
     }
 
     Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Login") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Volver atrás"
+                        )
+                    }
+                }
+            )
+        },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { paddingValues ->
         LoginForm(
             onLoginClick = { email, password ->
-                // Al pulsar el botón, se pide la huella
                 showBiometricPrompt(email, password)
             },
             onRegisterClick = {
@@ -101,7 +111,6 @@ fun LoginScreen(
         )
     }
 
-    // Manejar estados de login (Success, Error, etc.)
     LaunchedEffect(loginState) {
         when (val state = loginState) {
             is LoginViewModel.LoginState.Error -> {

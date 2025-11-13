@@ -13,6 +13,7 @@ import com.example.rinconinalambricomovil.components.CartIconWithMenu
 import com.example.rinconinalambricomovil.ui.navigation.Routes
 import com.example.rinconinalambricomovil.ui.state.CarritoViewModel
 import androidx.compose.material3.CenterAlignedTopAppBar
+
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun HomeScreen(
@@ -50,6 +51,13 @@ fun HomeScreen(
                 modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
             ) {
                 Text("Ir a Login")
+            }
+
+            Button(
+                onClick = { nav.navigate(Routes.REGISTER) },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Registrar")
             }
         }
     }
