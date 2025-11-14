@@ -74,4 +74,5 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended") // iconos
     implementation("androidx.activity:activity-compose:1.9.2")
     implementation("androidx.navigation:navigation-compose:2.7.7")
+    implementation("androidx.biometric:biometric:1.1.0")
 }

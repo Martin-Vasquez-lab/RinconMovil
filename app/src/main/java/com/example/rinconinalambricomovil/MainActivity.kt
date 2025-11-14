@@ -1,10 +1,10 @@
 package com.example.rinconinalambricomovil
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -18,7 +18,7 @@ import com.example.rinconinalambricomovil.ui.screens.RegistrarScreen
 import com.example.rinconinalambricomovil.ui.state.CarritoViewModel
 import com.example.rinconinalambricomovil.ui.theme.RinconInalambricoMovilTheme
 
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
