@@ -5,7 +5,8 @@ data class Producto(
     val nombre: String,
     val precio: Double,
     val descripcion: String,
-    val categoria: Categoria
+    val categoria: Categoria,
+    val imagenRes: Int
 )
 
 enum class Categoria { MANGA, AUDIFONOS, FIGURAS, CONSOLAS }

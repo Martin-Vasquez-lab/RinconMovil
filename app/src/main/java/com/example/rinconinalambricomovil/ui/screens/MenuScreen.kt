@@ -13,6 +13,9 @@ import com.example.rinconinalambricomovil.components.CartIconWithMenu
 import com.example.rinconinalambricomovil.ui.navigation.Routes
 import com.example.rinconinalambricomovil.ui.state.CarritoViewModel
 import androidx.compose.material3.CenterAlignedTopAppBar
+import com.example.rinconinalambricomovil.components.DecorGif
+
+
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -59,6 +62,9 @@ fun HomeScreen(
             ) {
                 Text("Registrar")
             }
+            Spacer(modifier = Modifier.height(24.dp))
+
+            DecorGif()
         }
     }
 }

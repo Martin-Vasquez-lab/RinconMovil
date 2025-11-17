@@ -1,40 +1,118 @@
 package com.example.rinconinalambricomovil.ui.state
 
-import androidx.compose.runtime.mutableStateListOf
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import android.content.Context
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.AndroidViewModel
+import com.example.rinconinalambricomovil.data.SampleData
 import com.example.rinconinalambricomovil.model.CartItem
 import com.example.rinconinalambricomovil.model.Producto
-import java.text.NumberFormat
-import java.util.Locale
+import org.json.JSONArray
+import org.json.JSONObject
 
+class CarritoViewModel(application: Application) : AndroidViewModel(application) {
 
+    // Lista observable para Compose
+    var items by mutableStateOf<List<CartItem>>(emptyList())
+        private set
 
-class CarritoViewModel : ViewModel() {
-    private val _items = mutableStateListOf<CartItem>()
-    val items: List<CartItem> get() = _items
+    // Cantidad total de ítems
+    val itemCount: Int
+        get() = items.sumOf { it.cantidad }
 
-    private val clp = NumberFormat.getCurrencyInstance(Locale("es","CL")).apply {
-        maximumFractionDigits = 0
+    // Total en plata
+    val total: Double
+        get() = items.sumOf { it.producto.precio * it.cantidad }
+
+    // SharedPreferences para guardar el carrito
+    private val prefs =
+        application.getSharedPreferences("carrito_prefs", Context.MODE_PRIVATE)
+
+    init {
+        // Cuando se crea el ViewModel, cargamos lo que haya guardado
+        cargarDesdePrefs()
     }
 
-    fun add(p: Producto) {
-        val idx = _items.indexOfFirst { it.producto.id == p.id }
-        if (idx >= 0) _items[idx] = _items[idx].copy(cantidad = _items[idx].cantidad + 1)
-        else _items.add(CartItem(p, 1))
+    // Formato para mostrar lucas
+    fun money(value: Double): String =
+        "$" + String.format("%,.0f", value)
+
+    // ------------ Operaciones del carrito ------------
+
+    fun add(producto: Producto) {
+        val lista = items.toMutableList()
+        val index = lista.indexOfFirst { it.producto.id == producto.id }
+        if (index >= 0) {
+            val actual = lista[index]
+            lista[index] = actual.copy(cantidad = actual.cantidad + 1)
+        } else {
+            lista.add(CartItem(producto, 1))
+        }
+        items = lista
+        guardarEnPrefs()
     }
-    fun minusOne(p: Producto) {
-        val idx = _items.indexOfFirst { it.producto.id == p.id }
-        if (idx >= 0) {
-            val it = _items[idx]
-            if (it.cantidad > 1) _items[idx] = it.copy(cantidad = it.cantidad - 1)
-            else _items.removeAt(idx)
+
+    fun minusOne(producto: Producto) {
+        val lista = items.toMutableList()
+        val index = lista.indexOfFirst { it.producto.id == producto.id }
+        if (index >= 0) {
+            val actual = lista[index]
+            if (actual.cantidad > 1) {
+                lista[index] = actual.copy(cantidad = actual.cantidad - 1)
+            } else {
+                lista.removeAt(index)
+            }
+            items = lista
+            guardarEnPrefs()
         }
     }
-    fun remove(p: Producto) { _items.removeAll { it.producto.id == p.id } }
-    fun clear() = _items.clear()
 
-    val itemCount get() = _items.sumOf { it.cantidad }
-    val total get() = _items.sumOf { it.producto.precio * it.cantidad }
+    fun remove(producto: Producto) {
+        items = items.filterNot { it.producto.id == producto.id }
+        guardarEnPrefs()
+    }
 
-    fun money(v: Double) = clp.format(v)
+    fun clear() {
+        items = emptyList()
+        guardarEnPrefs()
+    }
+
+    // ------------ Persistencia en SharedPreferences ------------
+
+    private fun guardarEnPrefs() {
+        val jsonArray = JSONArray()
+        for (item in items) {
+            val obj = JSONObject()
+            obj.put("id", item.producto.id)
+            obj.put("cantidad", item.cantidad)
+            jsonArray.put(obj)
+        }
+        prefs.edit()
+            .putString("carrito_items", jsonArray.toString())
+            .apply()
+    }
+
+    private fun cargarDesdePrefs() {
+        val jsonStr = prefs.getString("carrito_items", null) ?: return
+        try {
+            val array = JSONArray(jsonStr)
+            val lista = mutableListOf<CartItem>()
+            val productosPorId = SampleData.productos.associateBy { it.id }
+
+            for (i in 0 until array.length()) {
+                val obj = array.getJSONObject(i)
+                val id = obj.getInt("id")
+                val cantidad = obj.getInt("cantidad")
+                val producto = productosPorId[id]
+                if (producto != null) {
+                    lista.add(CartItem(producto, cantidad))
+                }
+            }
+            items = lista
+        } catch (_: Exception) {
+            // Si algo sale mal leyendo el JSON, simplemente no cargamos nada
+        }
+    }
 }
