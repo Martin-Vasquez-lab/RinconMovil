@@ -16,6 +16,12 @@ import androidx.navigation.NavController
 import com.example.rinconinalambricomovil.model.CartItem
 import com.example.rinconinalambricomovil.ui.state.CarritoViewModel
 import kotlinx.coroutines.launch
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.rinconinalambricomovil.ui.state.UserSessionViewModel
+import com.example.rinconinalambricomovil.ui.state.PedidoViewModel
+import com.example.rinconinalambricomovil.model.PedidoItemRequest
+
+
 
 
 private enum class PaymentMethod {
@@ -26,7 +32,8 @@ private enum class PaymentMethod {
 @Composable
 fun CarritoScreen(
     navController: NavController,
-    carritoVM: CarritoViewModel
+    carritoVM: CarritoViewModel,
+    sessionVM: UserSessionViewModel
 ) {
     val snackBarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -38,6 +45,12 @@ fun CarritoScreen(
     var cardExpiry by remember { mutableStateOf("") }
     var cardCvv by remember { mutableStateOf("") }
     var paypalEmail by remember { mutableStateOf("") }
+    //val sessionVM: UserSessionViewModel = viewModel()
+    val usuario = sessionVM.usuarioActual.value
+    val pedidoVM: PedidoViewModel = viewModel()
+
+
+
 
     Scaffold(
         topBar = {
@@ -108,9 +121,38 @@ fun CarritoScreen(
                                             "Revisa los datos de pago antes de continuar"
                                         )
                                     } else {
-                                        snackBarHostState.showSnackbar("Compra realizada con éxito")
-                                        carritoVM.clear()
+
+                                        if (usuario == null) {
+                                            snackBarHostState.showSnackbar("Debes iniciar sesión para completar la compra")
+                                            return@launch
+                                        }
+
+
+                                        val pedido = carritoVM.crearPedidoRequest(
+                                            nombre = usuario.nombre,
+                                            direccion = "Sin dirección", // luego puedes agregar dirección real
+                                            telefono = usuario.telefono,
+                                            metodoPago = when (paymentMethod) {
+                                                PaymentMethod.CARD -> "TARJETA"
+                                                PaymentMethod.PAYPAL -> "PAYPAL"
+                                            }
+                                        )
+                                        pedidoVM.enviarPedido(pedido) { exito, mensaje ->
+                                            scope.launch {
+                                                if (exito) {
+                                                    println("=== PEDIDO ENVIADO OK ===")
+                                                    println(pedido)
+                                                    snackBarHostState.showSnackbar("Compra realizada con éxito")
+                                                    carritoVM.clear()
+                                                } else {
+                                                    snackBarHostState.showSnackbar("Error al enviar pedido: $mensaje")
+                                                }
+                                            }
+                                        }
+
+
                                     }
+
                                 }
                             }
                         ) {
@@ -247,7 +289,7 @@ private fun PaymentSection(
             OutlinedTextField(
                 value = cardName,
                 onValueChange = { input ->
-                    
+
                     val filtered = input
                         .filter { it.isLetter() || it.isWhitespace() }
                         .take(40)

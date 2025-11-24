@@ -17,6 +17,7 @@ import com.example.rinconinalambricomovil.ui.screens.LoginScreen
 import com.example.rinconinalambricomovil.ui.screens.RegistrarScreen
 import com.example.rinconinalambricomovil.ui.state.CarritoViewModel
 import com.example.rinconinalambricomovil.ui.theme.RinconInalambricoMovilTheme
+import com.example.rinconinalambricomovil.ui.state.UserSessionViewModel
 
 class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,6 +27,7 @@ class MainActivity : FragmentActivity() {
                 Surface(color = MaterialTheme.colorScheme.background) {
                     val nav = rememberNavController()
                     val carritoVM: CarritoViewModel = viewModel()
+                    val sessionVM: UserSessionViewModel = viewModel()
 
                     NavHost(navController = nav, startDestination = Routes.HOME) {
                         composable(Routes.HOME) {
@@ -36,10 +38,10 @@ class MainActivity : FragmentActivity() {
                             CategoriaScreen(nav = nav, carritoVM = carritoVM, categoriaParam = cat)
                         }
                         composable(Routes.CARRITO) {
-                            CarritoScreen(navController = nav, carritoVM = carritoVM)
+                            CarritoScreen(navController = nav, carritoVM = carritoVM, sessionVM = sessionVM)
                         }
                         composable(Routes.LOGIN) {
-                            LoginScreen(navController = nav)
+                            LoginScreen(navController = nav, sessionViewModel = sessionVM)
                         }
                         composable(Routes.REGISTER){
                             RegistrarScreen(navController = nav)

@@ -4,11 +4,14 @@ import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rinconinalambricomovil.data.Usuarios
+import com.example.rinconinalambricomovil.model.User
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+
+
 
 class LoginViewModel : ViewModel() {
 
@@ -16,7 +19,7 @@ class LoginViewModel : ViewModel() {
     sealed class LoginState {
         object Idle : LoginState()
         object Loading : LoginState()
-        object Success : LoginState()
+        data class Success(val user: User) : LoginState()
         data class Error(val message: String) : LoginState()
     }
 
@@ -31,23 +34,27 @@ class LoginViewModel : ViewModel() {
             delay(2000)
 
             // Validaciones locales sin API
-            when {
-                Usuarios.validateUser(email,password) ->{
-                    val user = Usuarios.getUser(email)
-                    println("Usuario logeado ${user?.email}")
+            if (Usuarios.validateUser(email, password)) {
 
-                    _loginState.value= LoginState.Success
+                val user = Usuarios.getUser(email)
+
+                if (user != null) {
+                    println("Usuario logeado correctamente: ${user.email}")
+                    _loginState.value = LoginState.Success(user)
+                } else {
+                    _loginState.value = LoginState.Error("No se pudo cargar el usuario.")
                 }
-                else -> {
-                    // ✅ Si pasa todas las validaciones, login exitoso
-                    _loginState.value = LoginState.Error("Gmail o contraseña no valida")
-                }
+
+            } else {
+                _loginState.value = LoginState.Error("Email o contraseña no válidos")
             }
         }
     }
+
     private fun isValidEmail(email: String): Boolean {
         return Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
+
     fun resetState() {
         _loginState.value = LoginState.Idle
     }

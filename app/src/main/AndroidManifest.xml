@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
 
     <application
@@ -11,7 +13,10 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/icono_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.RinconInalambricoMovil">
+        android:theme="@style/Theme.RinconInalambricoMovil"
+        android:usesCleartextTraffic="true"
+        android:networkSecurityConfig="@xml/network_security_config">
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

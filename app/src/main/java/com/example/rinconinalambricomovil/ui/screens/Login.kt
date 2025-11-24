@@ -19,6 +19,10 @@ import com.example.rinconinalambricomovil.components.Login.LoginForm
 import com.example.rinconinalambricomovil.components.Login.LoginViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import com.example.rinconinalambricomovil.ui.state.UserSessionViewModel
+import com.example.rinconinalambricomovil.ui.navigation.Routes
+
+
 
 // Helper function to find the activity
 private fun Context.findActivity(): FragmentActivity? = when (this) {
@@ -31,7 +35,8 @@ private fun Context.findActivity(): FragmentActivity? = when (this) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
-    navController: NavController
+    navController: NavController,
+    sessionViewModel: UserSessionViewModel
 ) {
     val viewModel: LoginViewModel = viewModel()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -39,6 +44,7 @@ fun LoginScreen(
     val isLoading = loginState is LoginViewModel.LoginState.Loading
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+    //val sessionVM: UserSessionViewModel = viewModel()
 
     fun showBiometricPrompt(email: String, pass: String) {
         val activity = context.findActivity()
@@ -119,11 +125,15 @@ fun LoginScreen(
                 viewModel.resetState()
             }
             is LoginViewModel.LoginState.Success -> {
-                navController.navigate("menu") {
-                    popUpTo("login") { inclusive = true }
+                sessionViewModel.iniciarSesion(state.user)
+
+                navController.navigate(Routes.HOME) {
+                    popUpTo(Routes.LOGIN) { inclusive = true }
                 }
             }
             else -> {}
         }
     }
+
+
 }

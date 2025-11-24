@@ -11,6 +11,10 @@ import com.example.rinconinalambricomovil.model.CartItem
 import com.example.rinconinalambricomovil.model.Producto
 import org.json.JSONArray
 import org.json.JSONObject
+import com.example.rinconinalambricomovil.model.PedidoItemRequest
+import com.example.rinconinalambricomovil.model.PedidoRequest
+
+
 
 class CarritoViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -26,12 +30,12 @@ class CarritoViewModel(application: Application) : AndroidViewModel(application)
     val total: Double
         get() = items.sumOf { it.producto.precio * it.cantidad }
 
-    // SharedPreferences para guardar el carrito
+
     private val prefs =
         application.getSharedPreferences("carrito_prefs", Context.MODE_PRIVATE)
 
     init {
-        // Cuando se crea el ViewModel, cargamos lo que haya guardado
+
         cargarDesdePrefs()
     }
 
@@ -68,6 +72,31 @@ class CarritoViewModel(application: Application) : AndroidViewModel(application)
             guardarEnPrefs()
         }
     }
+
+    fun crearPedidoRequest(
+        nombre: String,
+        direccion: String,
+        telefono: String,
+        metodoPago: String
+    ): PedidoRequest {
+
+        val itemsPedido = items.map { cartItem ->
+            PedidoItemRequest(
+                productoId = cartItem.producto.id,
+                cantidad = cartItem.cantidad,
+                precioUnitario = cartItem.producto.precio
+            )
+        }
+
+        return PedidoRequest(
+            usuarioId = 1,  // temporal
+            carroId = 1,    // temporal
+            formaPagoId = if (metodoPago == "TARJETA") 1 else 2,
+            monto = total
+        )
+
+    }
+
 
     fun remove(producto: Producto) {
         items = items.filterNot { it.producto.id == producto.id }
