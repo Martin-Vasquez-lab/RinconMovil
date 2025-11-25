@@ -1,4 +1,4 @@
-package com.example.rinconinalambricomovil.api
+package com.example.rinconinalambricomovil.Api
 
 import com.example.rinconinalambricomovil.model.PedidoRequest
 import com.example.rinconinalambricomovil.model.PedidoResponse
