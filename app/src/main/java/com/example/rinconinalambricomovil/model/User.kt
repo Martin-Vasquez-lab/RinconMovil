@@ -23,7 +23,7 @@ data class User(
     val password: String,
 
     @SerializedName("telefono")
-    val telefono: Int,
+    val telefono: String,
 
     @SerializedName("rol")
     val rol: Rol
