@@ -77,7 +77,7 @@ class RegisterViewModel : ViewModel() {
                     nombre = nombre,
                     email = email,
                     password = password, // En una app real, esto debería estar encriptado ANTES de enviarse
-                    telefono = telefono.toIntOrNull() ?: 0, // Convertir a Int
+                    telefono = telefono, // Convertir a Int
                     rol = Rol(id = 2, nombre = "CLIENTE") // Asignar un rol por defecto (ej. ID 2 para Cliente)
                 )
 

@@ -87,4 +87,25 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+    // Testing - JUnit 5 (más moderno que JUnit 4)
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.0")
+    // Testing - Assertions y matchers
+    testImplementation("org.assertj:assertj-core:3.24.2")
+    // Testing - Mocks (Mockito para Kotlin)
+    testImplementation("org.mockito:mockito-core:5.6.0")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
+    // Testing - ViewModel y LiveData
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
+    // Testing - Coroutines
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    // Testing - Robolectric (para tests que necesitan contexto Android)
+    testImplementation("org.robolectric:robolectric:4.10.3")
+    // Testing - MockWebServer (para tests de Retrofit)
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
+    // Testing - Truth (librería de assertions de Google)
+    testImplementation("com.google.truth:truth:1.1.5")
+
+
+
 }
