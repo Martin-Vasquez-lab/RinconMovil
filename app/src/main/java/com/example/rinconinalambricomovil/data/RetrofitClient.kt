@@ -2,9 +2,10 @@ package com.example.rinconinalambricomovil.data
 
 import com.example.rinconinalambricomovil.Api.CatalogoApi
 import com.example.rinconinalambricomovil.Api.PedidoApi
-import com.example.rinconinalambricomovil.Api.UsuarioApi // Importación añadida
+import com.example.rinconinalambricomovil.Api.UsuarioApi
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import com.example.rinconinalambricomovil.Api.CarritoApi
 
 object RetrofitClient {
 
@@ -46,5 +47,8 @@ object RetrofitClient {
     // NOTA: Creación del servicio para la API de Usuario. (AÑADIDO)
     val usuarioApi: UsuarioApi by lazy {
         getRetrofitInstance(USUARIO_BASE_URL).create(UsuarioApi::class.java)
+    }
+    val carritoApi: CarritoApi by lazy {
+        getRetrofitInstance(CATALOGO_BASE_URL).create(CarritoApi::class.java)
     }
 }

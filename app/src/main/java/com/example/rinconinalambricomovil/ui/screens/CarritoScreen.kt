@@ -21,9 +21,6 @@ import com.example.rinconinalambricomovil.ui.state.UserSessionViewModel
 import com.example.rinconinalambricomovil.ui.state.PedidoViewModel
 import com.example.rinconinalambricomovil.model.PedidoItemRequest
 
-
-
-
 private enum class PaymentMethod {
     CARD, PAYPAL
 }
@@ -45,12 +42,8 @@ fun CarritoScreen(
     var cardExpiry by remember { mutableStateOf("") }
     var cardCvv by remember { mutableStateOf("") }
     var paypalEmail by remember { mutableStateOf("") }
-    //val sessionVM: UserSessionViewModel = viewModel()
     val usuario = sessionVM.usuarioActual.value
     val pedidoVM: PedidoViewModel = viewModel()
-
-
-
 
     Scaffold(
         topBar = {
@@ -66,7 +59,10 @@ fun CarritoScreen(
                 },
                 actions = {
                     if (carritoVM.itemCount > 0) {
-                        IconButton(onClick = { carritoVM.clear() }) {
+                        IconButton(onClick = {
+                            carritoVM.clear()
+                            usuario?.id?.let { carritoVM.syncVaciarCarrito(it) }
+                        }) {
                             Icon(
                                 Icons.Filled.Delete,
                                 contentDescription = "Vaciar carrito"
@@ -121,17 +117,13 @@ fun CarritoScreen(
                                             "Revisa los datos de pago antes de continuar"
                                         )
                                     } else {
-
                                         if (usuario == null) {
                                             snackBarHostState.showSnackbar("Debes iniciar sesión para completar la compra")
                                             return@launch
                                         }
 
-
                                         val pedido = carritoVM.crearPedidoRequest(
-                                            nombre = usuario.nombre,
-                                            direccion = "Sin dirección", // luego puedes agregar dirección real
-                                            telefono = usuario.telefono,
+                                            usuarioId = usuario.id!!,
                                             metodoPago = when (paymentMethod) {
                                                 PaymentMethod.CARD -> "TARJETA"
                                                 PaymentMethod.PAYPAL -> "PAYPAL"
@@ -144,21 +136,19 @@ fun CarritoScreen(
                                                     println(pedido)
                                                     snackBarHostState.showSnackbar("Compra realizada con éxito")
                                                     carritoVM.clear()
+                                                    // Limpiar carrito en backend también
+                                                    carritoVM.syncVaciarCarrito(usuario.id!!)
                                                 } else {
                                                     snackBarHostState.showSnackbar("Error al enviar pedido: $mensaje")
                                                 }
                                             }
                                         }
-
-
                                     }
-
                                 }
                             }
                         ) {
                             Text("Comprar")
                         }
-
                     }
                 }
             }
@@ -182,7 +172,7 @@ fun CarritoScreen(
             ) {
                 // Lista de productos en el carrito
                 items(items = carritoVM.items, key = { it.producto.id }) { item ->
-                    CartRow(item, carritoVM)
+                    CartRow(item, carritoVM, usuario?.id)
                 }
 
                 // Sección de pago al final de la lista
@@ -210,7 +200,7 @@ fun CarritoScreen(
 }
 
 @Composable
-private fun CartRow(item: CartItem, carritoVM: CarritoViewModel) {
+private fun CartRow(item: CartItem, carritoVM: CarritoViewModel, usuarioId: Int?) {
     Card(Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp)) {
             Text(item.producto.nombre, style = MaterialTheme.typography.titleMedium)
@@ -220,9 +210,9 @@ private fun CartRow(item: CartItem, carritoVM: CarritoViewModel) {
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                OutlinedButton(onClick = { carritoVM.minusOne(item.producto) }) { Text("-") }
+                OutlinedButton(onClick = { carritoVM.minusOne(item.producto, usuarioId) }) { Text("-") }
                 Text("Cantidad: ${item.cantidad}")
-                OutlinedButton(onClick = { carritoVM.add(item.producto) }) { Text("+") }
+                OutlinedButton(onClick = { carritoVM.add(item.producto, usuarioId) }) { Text("+") }
                 Spacer(Modifier.weight(1f))
                 Text(
                     "Subtotal: ${
@@ -233,7 +223,7 @@ private fun CartRow(item: CartItem, carritoVM: CarritoViewModel) {
                 )
             }
             Spacer(Modifier.height(8.dp))
-            TextButton(onClick = { carritoVM.remove(item.producto) }) {
+            TextButton(onClick = { carritoVM.remove(item.producto, usuarioId) }) {
                 Text("Eliminar")
             }
         }

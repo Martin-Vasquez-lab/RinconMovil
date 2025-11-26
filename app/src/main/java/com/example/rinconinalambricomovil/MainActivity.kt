@@ -41,7 +41,7 @@ class MainActivity : FragmentActivity() {
                             CarritoScreen(navController = nav, carritoVM = carritoVM, sessionVM = sessionVM)
                         }
                         composable(Routes.LOGIN) {
-                            LoginScreen(navController = nav, sessionViewModel = sessionVM)
+                            LoginScreen(navController = nav, sessionViewModel = sessionVM, carritoViewModel = carritoVM)
                         }
                         composable(Routes.REGISTER){
                             RegistrarScreen(navController = nav)
