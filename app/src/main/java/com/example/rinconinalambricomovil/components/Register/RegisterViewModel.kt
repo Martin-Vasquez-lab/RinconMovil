@@ -5,15 +5,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import android.util.Patterns
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import androidx.lifecycle.viewModelScope
-import com.example.rinconinalambricomovil.data.Usuarios
+import com.example.rinconinalambricomovil.data.RetrofitClient
+import com.example.rinconinalambricomovil.model.Rol
 import com.example.rinconinalambricomovil.model.User
+import kotlinx.coroutines.launch
 
 class RegisterViewModel : ViewModel() {
     // Estado del formulario
     var nombre by mutableStateOf("")
+        private set
+    var rut by mutableStateOf("") // <-- AÑADIDO
         private set
     var email by mutableStateOf("")
         private set
@@ -37,6 +39,7 @@ class RegisterViewModel : ViewModel() {
     // Validaciones en tiempo real
     val formularioValido: Boolean
         get() = nombre.isNotEmpty() &&
+                rut.isNotEmpty() &&
                 emailValid &&
                 password.length >= 6 &&
                 passwordsMatch &&
@@ -50,13 +53,14 @@ class RegisterViewModel : ViewModel() {
 
     // Funciones para actualizar campos
     fun updateNombre(nuevoNombre: String) { nombre = nuevoNombre }
+    fun updateRut(nuevoRut: String) { rut = nuevoRut } // <-- AÑADIDO
     fun updateEmail(nuevoEmail: String) { email = nuevoEmail }
     fun updatePassword(nuevaPassword: String) { password = nuevaPassword }
     fun updateConfirmPassword(confirm: String) { confirmPassword = confirm }
     fun updateTelefono(nuevoTelefono: String) { telefono = nuevoTelefono }
     fun updateAceptaTerminos(acepta: Boolean) { aceptaTerminos = acepta }
 
-    // LÓGICA DE REGISTRO CON TU CLASE Usuarios
+    // --- LÓGICA DE REGISTRO CONECTADA AL BACKEND ---
     fun registrarUsuario() {
         if (!formularioValido) {
             errorMessage = "Por favor completa todos los campos correctamente"
@@ -68,33 +72,31 @@ class RegisterViewModel : ViewModel() {
 
         viewModelScope.launch {
             try {
-                delay(1000) // Pequeña simulación de delay
-
-                // LÓGICA REAL DE REGISTRO CON TU CLASE Usuarios
-                // 1. Verificar si el usuario ya existe
-                if (Usuarios.existeUsuario(email)) {
-                    errorMessage = "Este email ya está registrado"
-                    return@launch
-                }
-
-                // 2. Crear nuevo usuario
                 val nuevoUsuario = User(
+                    rut = rut,
                     nombre = nombre,
                     email = email,
-                    password = password, // En una app real, esto debería estar encriptado
-                    telefono = telefono
+                    password = password, // En una app real, esto debería estar encriptado ANTES de enviarse
+                    telefono = telefono.toIntOrNull() ?: 0, // Convertir a Int
+                    rol = Rol(id = 2, nombre = "CLIENTE") // Asignar un rol por defecto (ej. ID 2 para Cliente)
                 )
 
-                // 3. Agregar a la lista de usuarios
-                Usuarios.agregarUsuario(nuevoUsuario)
+                //  Llamar a la API de Retrofit para registrar el usuario
+                val response = RetrofitClient.usuarioApi.registrarUsuario(nuevoUsuario)
 
-                // 4. Éxito
-                registroExitoso = true
-                println("Usuario registrado: ${nuevoUsuario.email}")
-                println("Total usuarios: ${Usuarios.users.size}")
+                // Procesar la respuesta
+                if (response.isSuccessful) {
+                    registroExitoso = true
+                    println("Usuario registrado a través de la API: ${response.body()?.email}")
+                } else {
+                    val errorBody = response.errorBody()?.string()
+                    errorMessage = "Error en el registro: $errorBody"
+                    println("Error del servidor: $errorBody")
+                }
 
             } catch (e: Exception) {
-                errorMessage = "Error al registrar: ${e.message}"
+                errorMessage = "Error de conexión: ${e.message}"
+                println("Error de conexión: ${e.message}")
             } finally {
                 isLoading = false
             }
@@ -103,6 +105,7 @@ class RegisterViewModel : ViewModel() {
 
     fun resetFormulario() {
         nombre = ""
+        rut = ""
         email = ""
         password = ""
         confirmPassword = ""

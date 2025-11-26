@@ -90,6 +90,13 @@ fun RegistrarScreen(
                 )
             }
 
+
+            OutlinedTextField(
+                value = viewModel.rut,
+                onValueChange = { viewModel.updateRut(it) },
+                label = { Text("RUT") }
+            )
+
             // Campo Teléfono
             OutlinedTextField(
                 value = viewModel.telefono,
